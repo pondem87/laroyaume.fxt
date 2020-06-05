@@ -3,13 +3,15 @@ var passport = require('passport');
 var pass_reset = require('../my_modules/pass_reset');
 var content = require('../my_modules/user_content');
 var aws = require('aws-sdk');
+var prst = require('../my_modules/pass_reset');
+
 var router = express.Router();
 
 var title = process.env.SITE;
 
 aws.config.update({
-  accessKeyId: 'AKIA3ODM2Z75AJ3BEN47',
-  secretAccessKey: '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'
+  accessKeyId: 'AKIA3ODM2Z75IR3S7FF6',
+  secretAccessKey: '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'
 });
 
 var s3 = new aws.S3();
@@ -92,11 +94,27 @@ router.get('/stream', function(req, res, next) {
 router.get('/logout', function(req, res) {
   req.logout();
   res.redirect('/');
-})
+});
+
+router.get('/forgot', function(req, res) {
+  res.render('users/forgot', { title: title });
+});
+
+router.get('/reset', function(req, res) {
+  prst.check_token(req, res);
+});
 
 /* POST users listing */
 router.post('/login', passport.authenticate('local', {
   successRedirect: '/', failureRedirect: '/users/profile?login=failed'
 }));
+
+router.post('/genreset', function(req, res) {
+  prst.generate_token(req, res);
+});
+
+router.post('/setpassword', function(req, res) {
+  prst.set_password(req, res);
+});
 
 module.exports = router;

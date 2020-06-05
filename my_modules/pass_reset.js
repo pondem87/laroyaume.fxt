@@ -3,6 +3,8 @@ const mailer = require('./email');
 const pool = require('./database').get_pool();
 const phash = require('./password_hashing')
 
+var title = process.env.SITE;
+
 const generate_token = (req, res) => {
   console.log("pass_reset: generate_token fxn called.");
   if (req.body.email == undefined) {
@@ -36,7 +38,7 @@ const generate_token = (req, res) => {
         mail.to = req.body.email;
         mail.subject = "La Royaume FXTC: Password Reset"
         mail.content = "You requested password reset. Follow the link below to reset your password.\r\n"
-          + "https://" + req.hostname + '/reset?token=' + token + "\r\n";
+          + "https://" + req.hostname + '/users/reset?token=' + token + "\r\n";
         mailer.send_mail(mail, (result) => {
           if (result) {
             res.send({text:"Email sent to your inbox. Login to your email and follow the link that was sent. Check spam folder if you cannot find it"});
@@ -50,7 +52,7 @@ const generate_token = (req, res) => {
 };
 
 const check_token = (req, res) => {
-  if (req.query.token == undefined);
+  if (req.query.token == undefined) throw new Error("No token defined for password reset`");
 
   pool.getConnection((error, connection) => {
     if (error) throw new Error(error.message);
@@ -65,17 +67,14 @@ const check_token = (req, res) => {
       }
 
       if (results.length == 1) {
-        res.render('newpassword', {
-          req: req,
-          category: req.category,
-          shipping: cmanager.get_shipping()
-        });
+        res.render('users/newpassword', { req: req, title: title });
       } else {
-        var msg = {};
-        msg.msg = "You have a bad password reset link.";
-        msg.links = [{ href: "/forgot", text: "Request reset again." }, { href: "/login?msg=0", text: "Try logging in again." }];
-        res.render('message', {msg: msg});
+        res.locals.message = "Invalid rest token. Try resetting again";
+        var error = { status: 500, stack: "Custom error message" };
+        res.locals.error = error;
+        res.render("error");
       }
+      connection.release();
     });
   });
 };
@@ -94,13 +93,20 @@ const set_password = (req, res) => {
     connection.query(sql, values, (error, results, fields) => {
       if (error) {
         connection.release();
-        throw new Error(error.message);
+        res.locals.message = error.message;
+        var error = { status: 500, stack: "Custom error message" };
+        res.locals.error = error;
+        res.render("error");
+        return;
       }
 
       if (results.changedRows == 1) {
-        res.send('password changed');
+        res.redirect('/');
       } else {
-        res.send('unexpected result');
+        res.locals.message = "Password cannot be set";
+        var error = { status: 500, stack: "Custom error message" };
+        res.locals.error = error;
+        res.render("error");
       }
     });
   });

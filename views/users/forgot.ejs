@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- https://fontawesome.com/ -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+    <!-- https://fonts.google.com/ -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/templatemo-video-catalog.css">
+</head>
+<body>
+  <div class="mx-auto tm-content-container">
+    <div class="row mt-3 mb-5 pb-3">
+      <div class="col-12">
+        <div class="col-7 col-md-4">
+          <div class="mx-auto tm-about-text-container px-3">
+            <h1>Password Reset</h1>
+            <p id="ps-message">Enter email to reset password of the linked account</p>
+            <div class="form-group">
+                <input id="email" type="email" name="email" class="form-control rounded-0" placeholder="Email" required="" />
+            </div>
+                <button class="btn btn-primary rounded-0 d-block ml-auto mr-0 tm-btn-animate tm-btn-submit tm-icon-submit"><span>Submit</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script src="../js/jquery-3.4.1.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('.btn').click(function() {
+      $('.btn').css('visibility', 'hidden');
+      var email = $('#email').val();
+      $.post('/users/genreset', { email: email }, function (data) {
+        $('#ps-message').html(data.text);
+        $('.btn').css('visibility','visible');
+      });
+    });
+  });
+</script>
+
+</html>
