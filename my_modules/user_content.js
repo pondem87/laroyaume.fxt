@@ -78,8 +78,89 @@ var get_video = function (req, res, next) {
   });
 };
 
+var get_subscriptions = function (req, res, next) {
+  if (!req.isAuthenticated()) {
+    next();
+    return;
+  }
+
+  pool.getConnection((error, connection) => {
+    if (error) throw new Error(error.message);
+
+    var sql = 'select * from `subscriptions_view` where `user_id` = ?';
+    var values = [req.user.id];
+    connection.query(sql, values, (error, results, fields) => {
+      if (error) {
+        connection.release();
+        throw new Error(error.message);
+      }
+
+      req.user.subscriptions = results;
+
+      sql = 'select * from `substypes`';
+      connection.query(sql, (error, results, fields) => {
+        if (error) {
+          connection.release();
+          throw new Error(error.message);
+        }
+
+        req.substypes = results;
+        connection.release();
+        next();
+      });
+    });
+  });
+};
+
+var set_details = function (req, res, next) {
+  var values = {};
+  if (req.body.name) {
+    var name = req.body.name;
+    if (!/^\s+$/.test(name) && name != "")
+    {
+      values.fullname = name;
+    }
+  }
+  if (req.body.email) {
+    var email = req.body.email;
+    if (!/^\s+$/.test(email) && email != "")
+    {
+      values.email = email;
+    }
+  }
+  if (req.body.phone) {
+    var phone = req.body.phone;
+    if (!/^\s+$/.test(phone) && phone != "")
+    {
+      values.phone = phone;
+    }
+  }
+
+  console.log("values = ", values);
+
+  if (values.fullname || values.email || values.phone) {
+    pool.getConnection((error, connection) => {
+      if (error) next(error);
+
+      var sql = 'update `user` set ? where `id` = ?';
+      connection.query(sql, [values, req.user.id],(error, results, fields) => {
+        if (error) {
+          connection.release();
+          next(error);
+          return;
+        }
+
+        connection.release();
+      });
+    });
+  }
+  res.redirect('/');
+};
+
 module.exports = {
   get_categories: get_categories,
   get_videolist: get_videolist,
-  get_video: get_video
+  get_video: get_video,
+  get_subscriptions: get_subscriptions,
+  set_details: set_details
 }

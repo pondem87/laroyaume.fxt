@@ -3,49 +3,52 @@
     <div class="col-12">
       <div class="mx-auto tm-about-text-container px-3">
         <h2 class="tm-page-title mb-4 tm-text-primary">User Access Panel</h2>
-                        <p class="mb-4"><b>Name: </b><%= req.user.fullname %></p>
-                        <p class="mb-4"><b>Email: </b><%= req.user.email %></p>
-                        <p class="mb-4"><b>Phone: </b><%= req.user.phone %></p>
-                        <div style="float: right;">
-                          <a href="/users/logout"><i class="fas fa-power-off fa-lg"></i>Logout</a>
-                        </div>
+        <p class="mb-4"><b>Name: </b><%= req.user.fullname %></p>
+        <p class="mb-4"><b>Email: </b><%= req.user.email %></p>
+        <p class="mb-4"><b>Phone: </b><%= req.user.phone %></p>
+        <div style="border-top:1px dashed grey; width:100%;">
+          <div style="display:inline; border:1px solid grey; margin:5px; padding: 5px; border-radius: 10px;" >
+            <a href="/users/edit"><i class="fas fa-pen fa-lg"></i>Edit details</a>
+          </div>
+          <div style="display:inline; border:1px solid grey; margin:5px; padding: 5px; border-radius: 10px;" >
+            <a href="/users/newpassword"><i class="fas fa-lock fa-lg"></i>Change password</a>
+          </div>
+          <div style="display:inline; border:1px solid grey; margin:5px; padding: 5px; border-radius: 10px;" >
+            <a href="/users/logout"><i class="fas fa-power-off fa-lg"></i>Logout</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-            <div class="mx-auto pb-3 tm-about-text-container px-3">
-                <div class="row">
-                    <div class="col-lg-6 mb-5">
-                        <form id="contact-form" action="" method="POST" class="tm-contact-form">
-                          <div class="form-group">
-                            <input type="text" name="name" class="form-control rounded-0" placeholder="Name" required="" />
-                          </div>
-                          <div class="form-group">
-                            <input type="email" name="email" class="form-control rounded-0" placeholder="Email" required="" />
-                          </div>
-                          <div class="form-group">
-                            <input type="text" name="phone" class="form-control rounded-0" placeholder="Phone" required="" />
-                          </div>
-                          <div class="form-group">
-                            <input type="text" name="subject" class="form-control rounded-0" placeholder="Subject" required="" />
-                          </div>
-                          <div class="form-group">
-                            <textarea rows="8" name="message" class="form-control rounded-0" placeholder="Message"
-                                      required=""></textarea>
-                          </div>
 
-                          <div class="form-group mb-0">
-                            <button type="submit" class="btn btn-primary rounded-0 d-block ml-auto mr-0 tm-btn-animate tm-btn-submit tm-icon-submit"><span>Submit</span></button>
-                          </div>
-                        </form>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="mapouter mb-60">
-                            <div class="gmap_canvas">
-                                <iframe width="100%" height="600" id="gmap_canvas"
-                                    src="https://maps.google.com/maps?q=parirenyatwa%20hospital%20harare&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                                    frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="mx-auto pb-3 tm-about-text-container px-3">
+    <div class="row">
+      <div class="col-lg-6 mb-5">
+        <div style="border:2px solid grey; border-radius:5px; padding:10px; margin:5px; width:100%;">
+            <h2 class="tm-page-title mb-4 tm-text-primary">Active Subscriptions</h2>
+            <table style="width: 100%;">
+              <tbody>
+                <tr><th>Subscription</th><th>Expiration Date</th></tr>
+                <% req.user.subscriptions.forEach(function(subscription) { %>
+                  <tr>
+                    <td><%= subscription.type %></td><%= subscription.ends %><td></td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+        </div>
+      </div>
+      <div class="col-lg-6 mb-5">
+        <div style="border:2px solid grey; border-radius:5px; padding:10px; margin:5px; width:100%;">
+            <h2 class="tm-page-title mb-4 tm-text-primary">Subscribe</h2>
+            <p>Pick a subscription option and subscribe today</p>
+            <select name="subtype">
+              <% req.substypes.forEach(function(substype) { %>
+                <option value="<%= substype.id %>"><%= substype.type %> at US$<%= substype.price %> for <%= substype.duration %> days</option>
+              <% }); %>
+            </select>
+            <p style="color:red;">Payment services have not yet been setup. <a href="/contact">Contact our team</a> for your subscription to be set up manually.</p>
+        </div>
+      </div>
+    </div>
+  </div>

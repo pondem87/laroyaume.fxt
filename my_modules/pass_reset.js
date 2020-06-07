@@ -87,17 +87,33 @@ const set_password = (req, res) => {
     const token = str.random(30);
 
     var pw = phash.gen_pword(req.body.password);
-    var hash = phash.gen_hash(req.body.token);
-    var values = [pw.hashed, pw.salt, token, hash];
-    var sql = 'update `user` set `hashed` = ?, `salt` = ?, `reset_code` = ? where `reset_code` = ?';
+    var hash;
+    var sql;
+
+    if (req.body.token) {
+      hash = phash.gen_hash(req.body.token);
+      sql = 'update `user` set `hashed` = ?, `salt` = ?, `reset_code` = ? where `reset_code` = ?';
+      values = [pw.hashed, pw.salt, token, hash];
+    } else if (req.isAuthenticated()) {
+      sql = 'update `user` set `hashed` = ?, `salt` = ? where `id` = ?';
+      values = [pw.hashed, pw.salt, req.user.id];
+      var is_valid = phash.is_password_valid(req.body.oldpassword, req.user.hashed, req.user.salt);
+      if (!is_valid) {
+        req.pwdfail = "Incorrect Password!!!";
+        res.render('users/newpassword', { req: req, title: title });
+        return;
+      }
+    } else {
+      res.locals.message = "Password Reset Failed";
+      var error = { status: 500, stack: "No reset token found and user not logged in..." };
+      res.locals.error = error;
+      res.render("error");
+    }
+
     connection.query(sql, values, (error, results, fields) => {
       if (error) {
         connection.release();
-        res.locals.message = error.message;
-        var error = { status: 500, stack: "Custom error message" };
-        res.locals.error = error;
-        res.render("error");
-        return;
+        throw new Error;
       }
 
       if (results.changedRows == 1) {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- https://fontawesome.com/ -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+    <!-- https://fonts.google.com/ -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/templatemo-video-catalog.css">
+</head>
+<body>
+  <div class="mx-auto tm-content-container">
+    <div class="row mt-3 mb-5 pb-3">
+      <div class="col-12">
+        <div class="col-7 col-md-4">
+          <div class="mx-auto tm-about-text-container px-3">
+            <form id="set-details" action="/users/setdetails" method="POST">
+              <h1>Update Personal Details</h1>
+              <p><b>Name: </b><%= req.user.fullname %></p>
+              <div class="form-group">
+                  <input type="text" name="name" class="form-control rounded-0" placeholder="Enter new name" />
+              </div>
+              <p><b>Email: </b><%= req.user.email %></p>
+              <div class="form-group">
+                 <input type="email" name="email" class="form-control rounded-0" placeholder="Enter new email" />
+              </div>
+              <p><b>Phone: </b><%= req.user.phone %></p>
+              <div class="form-group">
+                  <input type="text" name="phone" class="form-control rounded-0" placeholder="Enter new number" />
+              </div>
+                  <button type="submit" class="btn btn-primary rounded-0 d-block ml-auto mr-0 tm-btn-animate tm-btn-submit tm-icon-submit"><span>Submit</span></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

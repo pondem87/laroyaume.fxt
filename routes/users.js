@@ -18,19 +18,22 @@ var s3 = new aws.S3();
 var bucket_name = 'laroyaumfxtc.video';
 
 /* GET users listing. */
-router.get('/profile', function(req, res, next) {
+router.get('/profile', content.get_subscriptions, function(req, res, next) {
   res.render('users/profile', {
     req: req,
     title: title
   });
 });
 
-router.get('/video-page', content.get_video, function(req, res, next) {
-  res.render('users/video-page', {
-    req: req,
-    title: title,
-    Range: ''
-  });
+router.get('/video-page', content.get_subscriptions, content.get_video, function(req, res, next) {
+  if (req.isAuthenticated()) {
+    res.render('users/video-page', {
+      req: req,
+      title: title,
+    });
+  } else {
+    res.redirect('users/profile');
+  }
 });
 
 router.get('/stream', function(req, res, next) {
@@ -53,7 +56,6 @@ router.get('/stream', function(req, res, next) {
       throw new error(error.message);
     }
     //file info received
-    console.log('S3.listObjectsV2 returned:', data);
     const key = data.Contents[0].Key;
     const filesize = data.Contents[0].Size;
 
@@ -104,6 +106,22 @@ router.get('/reset', function(req, res) {
   prst.check_token(req, res);
 });
 
+router.get('/newpassword', function(req, res) {
+  if (req.isAuthenticated()) {
+    res.render('users/newpassword', { req: req, title: title });
+  } else {
+    res.redirect('/users/profile');
+  }
+});
+
+router.get('/edit', function(req, res) {
+  if (req.isAuthenticated()) {
+    res.render('users/edit', { req: req, title: title });
+  } else {
+    res.redirect('/users/profile');
+  }
+});
+
 /* POST users listing */
 router.post('/login', passport.authenticate('local', {
   successRedirect: '/', failureRedirect: '/users/profile?login=failed'
@@ -115,6 +133,10 @@ router.post('/genreset', function(req, res) {
 
 router.post('/setpassword', function(req, res) {
   prst.set_password(req, res);
+});
+
+router.post('/setdetails', function(req, res, next) {
+  content.set_details(req, res, next);
 });
 
 module.exports = router;
