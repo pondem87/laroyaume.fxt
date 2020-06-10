@@ -9,11 +9,6 @@ var router = express.Router();
 
 var title = process.env.SITE;
 
-aws.config.update({
-  accessKeyId: 'AKIA3ODM2Z75IR3S7FF6',
-  secretAccessKey: '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'
-});
-
 var s3 = new aws.S3();
 var bucket_name = 'laroyaumfxtc.video';
 
@@ -32,7 +27,7 @@ router.get('/video-page', content.get_subscriptions, content.get_video, function
       title: title,
     });
   } else {
-    res.redirect('users/profile');
+    res.redirect('/users/profile');
   }
 });
 

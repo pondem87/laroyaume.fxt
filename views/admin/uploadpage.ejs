@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- https://fontawesome.com/ -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+    <!-- https://fonts.google.com/ -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/templatemo-video-catalog.css">
+    <style>
+      .progress-bar {
+        border: 3px solid darkblue;
+        background: white;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: blue;
+      }
+
+      .progress-bar, .progress-bar-fill {
+        border-radius: 50px;
+      }
+    </style>
+</head>
+<body>
+  <div class="mx-auto tm-content-container">
+    <div class="row mt-3 mb-5 pb-3">
+      <div class="col-12">
+        <div class="col-12 col-md-6">
+          <div class="mx-auto tm-about-text-container px-3">
+            <h1>Upload Video</h1>
+            <form id="upload-video" action="/admin/upload" method="POST" enctype="multipart/form-data">
+              <span id="ps-message"></span>
+              <div class="form-group">
+                <input type="text" name="title" class="form-control rounded-0" placeholder="Video Title" required="" />
+              </div>
+              <div class="form-group">
+                <textarea rows="4" name="summary" class="form-control rounded-0" placeholder="Summary"
+                        required=""></textarea>
+              </div>
+              <div class="form-group">
+                <select name="category" form="upload-video">
+                  <% req.categories.forEach((category, i) => { %>
+                    <option value="<%= category.id %>"><%= category.name %></option>
+                  <% }); %>
+                </select>
+              </div>
+              <div class="form-group">
+                <input type="file" name="video" accept="video/mp4" required="">
+              </div>
+              <button id="upload-btn" type="submit" class="btn btn-primary rounded-0 d-block ml-auto mr-0 tm-btn-animate tm-btn-submit tm-icon-submit"><span>Submit</span></button>
+            </form>
+            <div style="padding: 10px">
+              <div id="progress-bar" class="progress-bar">
+                <div class="progress-bar-fill">
+                  <span class="progress-bar-text">0</span>
+                </div>
+              </div>
+            <div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script src="../js/jquery-3.4.1.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#upload-video').on('submit', function(event) {
+      event.preventDefault();
+
+      $('#upload-btn').css('visibility', 'hidden');
+
+      var form_data = new FormData($('#upload-video')[0]);
+
+      $.ajax({
+        xhr: function() {
+          var xhr = new window.XMLHttpRequest();
+          xhr.upload.addEventListener('progress', function(e) {
+            console.log(e);
+            if (e.lengthComputable) {
+              var percent = (e.loaded/e.total * 100).toFixed(1);
+              $('.progress-bar-text').html(percent + '%');
+              $('.progress-bar-fill').css('width', percent + '%');
+            }
+          });
+          return xhr;
+        },
+        type: 'POST',
+        url: '/admin/upload',
+        data: form_data,
+        processData: false,
+        contentType: false,
+        success: function(data) {
+          alert(data);
+          $('#upload-video')[0].reset();
+          $('#upload-btn').css('visibility', 'visible');
+        }
+      });
+
+    });
+  });
+</script>
+
+</html>
