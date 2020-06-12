@@ -4,13 +4,14 @@ var pass_reset = require('../my_modules/pass_reset');
 var content = require('../my_modules/user_content');
 var aws = require('aws-sdk');
 var prst = require('../my_modules/pass_reset');
+var auth = require('../my_modules/auth');
 
 var router = express.Router();
 
 var title = process.env.SITE;
 
 var s3 = new aws.S3();
-var bucket_name = 'laroyaumfxtc.video';
+var bucket_name = process.env.AWS_BUCKET;
 
 /* GET users listing. */
 router.get('/profile', content.get_subscriptions, function(req, res, next) {
@@ -20,18 +21,14 @@ router.get('/profile', content.get_subscriptions, function(req, res, next) {
   });
 });
 
-router.get('/video-page', content.get_subscriptions, content.get_video, function(req, res, next) {
-  if (req.isAuthenticated()) {
+router.get('/video-page', auth.isAuth, content.get_subscriptions, content.get_video, function(req, res, next) {
     res.render('users/video-page', {
       req: req,
       title: title,
     });
-  } else {
-    res.redirect('/users/profile');
-  }
 });
 
-router.get('/stream', function(req, res, next) {
+router.get('/stream', auth.isAuth, function(req, res, next) {
   //file to be streamed
   var file = req.query.file;
   var range = req.headers.range;
@@ -48,7 +45,7 @@ router.get('/stream', function(req, res, next) {
   s3.listObjectsV2(params, function(error, data) {
     if (error) {
       console.log("Error in S3.listObjectsV2 call:", error.message);
-      throw new error(error.message);
+      throw new Error(error.message);
     }
     //file info received
     const key = data.Contents[0].Key;
@@ -88,7 +85,7 @@ router.get('/stream', function(req, res, next) {
   });
 });
 
-router.get('/logout', function(req, res) {
+router.get('/logout', auth.isAuth, function(req, res) {
   req.logout();
   res.redirect('/');
 });
@@ -101,15 +98,11 @@ router.get('/reset', function(req, res) {
   prst.check_token(req, res);
 });
 
-router.get('/newpassword', function(req, res) {
-  if (req.isAuthenticated()) {
+router.get('/newpassword', auth.isAuth, function(req, res) {
     res.render('users/newpassword', { req: req, title: title });
-  } else {
-    res.redirect('/users/profile');
-  }
 });
 
-router.get('/edit', function(req, res) {
+router.get('/edit', auth.isAuth, function(req, res) {
   if (req.isAuthenticated()) {
     res.render('users/edit', { req: req, title: title });
   } else {
@@ -130,7 +123,7 @@ router.post('/setpassword', function(req, res) {
   prst.set_password(req, res);
 });
 
-router.post('/setdetails', function(req, res, next) {
+router.post('/setdetails', auth.isAuth, function(req, res, next) {
   content.set_details(req, res, next);
 });
 

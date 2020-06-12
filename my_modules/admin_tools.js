@@ -42,7 +42,7 @@ var insert_video = function (req, res) {
       }
       connection.release();
       console.log("admin_tools: inset_video: database updated")
-      res.send("Video Uploaded");
+      res.send("\"" + req.body.title + "\" : video Uploaded");
     });
   });
 };

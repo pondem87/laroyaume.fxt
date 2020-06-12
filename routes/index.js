@@ -8,7 +8,7 @@ var title = process.env.SITE;
 var email = process.env.CONTACT_MAIL;
 var app_number = process.env.CONTACT_NUMBER;
 
-/* GET home page. */
+/* GET request routes */
 router.get('/', content.get_categories, content.get_videolist, function(req, res, next) {
   res.render('index', {
     title: title,
@@ -28,6 +28,11 @@ router.get('/contact', function(req, res, next) {
   });
 });
 
+router.get('/unsubscribe', function(req, res, next) {
+  content.unsubscribe(req, res, next);
+});
+
+/* POST request routes */
 router.post('/register', function(req, res) {
   register.register(req, res);
 });
@@ -41,6 +46,10 @@ router.post('/message', (req, res) => {
     if (success) res.send("Message sent successfully!");
     else res.send("Failed to send message!");
   });
+});
+
+router.post('/subscribe', function(req, res, next) {
+  content.subscribe(req, res, next);
 });
 
 module.exports = router;

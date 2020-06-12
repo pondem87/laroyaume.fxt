@@ -138,30 +138,9 @@ https://templatemo.com/tm-552-video-catalog
 
   </div>
 		<script src="js/jquery-3.4.1.min.js"></script>
+		<script src="js/jquery.validate.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/parallax.min.js"></script>
-		<script>
-			$(document).ready(function() {
-				$('#contact-form').on('submit', function(event) {
-			    event.preventDefault();
-
-			    var form_data = $('#contact-form').serialize();
-
-					$('#contact-btn').css('visibility', 'hidden');
-
-			    $.ajax({
-			      type: 'POST',
-			      url: '/message',
-			      data: form_data,
-			      processData: false,
-			      success: function(data) {
-			        alert(data);
-			        $('#contact-form')[0].reset();
-							$('#contact-btn').css('visibility', 'visible');
-			      }
-			    });
-			  });
-			});
-		</script>
+		<script src="js/custom.min.js"></script>
 </body>
 </html>
