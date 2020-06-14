@@ -173,7 +173,7 @@ var subscribe = function (req, res, next) {
       if (error) {
         res.send("Could not subscribe. You may already be subscribed.");
         connection.release();
-        next(error);
+        //next(error);
         return;
       }
 
