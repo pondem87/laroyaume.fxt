@@ -5,27 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-    <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- https://fontawesome.com/ -->
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
-    <!-- https://fonts.google.com/ -->
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/templatemo-video-catalog.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
 </head>
+
 <body>
-  <div class="mx-auto tm-content-container">
-    <div class="row mt-3 mb-5 pb-3">
-      <div class="col-12">
-        <div class="col-12 col-md-6">
-          <h2>WELCOME TO YOUR ADMIN PAGE</h2>
-          <h4>Use options below to add or edit content<h4>
-          <ul>
-            <li><a href="/admin/uploadpage">Upload Video</a></li>
-            <li><a href="/admin/addthumbnail">Add Thumbnail</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
+  <%- include("./common/navbar.ejs") %>
+
+  <div class="container">
+    <h2 class="indigo-text text-darken-3">ADMINSTRATOR HOME PAGE</h2>
+    <h4 class="indigo-text text-darken-4">You are logged in with administrator privileges<h4>
   </div>
+
+  <script src="../js/jquery-3.4.1.min.js"></script>
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $(".sidenav").sidenav();
+    });
+  </script>
 </body>
 
 </html>

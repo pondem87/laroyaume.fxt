@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <style>
+      .progress-bar {
+        border: 3px solid darkblue;
+        background: white;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: blue;
+      }
+
+      .progress-bar, .progress-bar-fill {
+        border-radius: 50px;
+      }
+    </style>
+</head>
+<body>
+
+  <%- include("./common/navbar.ejs") %>
+
+  <div class="container">
+    <h3 class="indigo-text text-darken-4">Send Mail</h3>
+    <p class="flow-text cyan-text text-darken-4">This page is where you send bulk mail to everyone who has subscribed to receive updates, i.e our mail list.</p>
+  </div>
+
+</body>
+
+<script src="../js/jquery-3.4.1.min.js"></script>
+  <!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $(".sidenav").sidenav();
+  });
+</script>
+
+</html>

@@ -5,21 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-    <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- https://fontawesome.com/ -->
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
-    <!-- https://fonts.google.com/ -->
-    <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/templatemo-video-catalog.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
     <style>
       .progress-bar {
-        border: 3px solid darkblue;
+        border: 3px solid #006064;
         background: white;
+        visibility: hidden;
       }
 
       .progress-bar-fill {
         height: 100%;
         width: 0%;
-        background: blue;
+        background: #0097a7;
       }
 
       .progress-bar, .progress-bar-fill {
@@ -28,54 +28,67 @@
     </style>
 </head>
 <body>
-  <div class="mx-auto tm-content-container">
-    <div class="row mt-3 mb-5 pb-3">
-      <div class="col-12">
-        <div class="col-12 col-md-6">
-          <div class="mx-auto tm-about-text-container px-3">
-            <h1>Upload Video</h1>
-            <form id="upload-video" action="/admin/upload" method="POST" enctype="multipart/form-data">
-              <span id="ps-message"></span>
-              <div class="form-group">
-                <input type="text" name="title" class="form-control rounded-0" placeholder="Video Title" required="" />
-              </div>
-              <div class="form-group">
-                <textarea rows="4" name="summary" class="form-control rounded-0" placeholder="Summary"
-                        required=""></textarea>
-              </div>
-              <div class="form-group">
-                <select name="category" form="upload-video">
-                  <% req.categories.forEach((category, i) => { %>
-                    <option value="<%= category.id %>"><%= category.name %></option>
-                  <% }); %>
-                </select>
-              </div>
-              <div class="form-group">
-                <input type="file" name="video" accept="video/mp4" required="">
-              </div>
-              <button id="upload-btn" type="submit" class="btn btn-primary rounded-0 d-block ml-auto mr-0 tm-btn-animate tm-btn-submit tm-icon-submit"><span>Submit</span></button>
-            </form>
-            <div style="padding: 10px">
-              <div id="progress-bar" class="progress-bar">
-                <div class="progress-bar-fill">
-                  <span class="progress-bar-text">0</span>
-                </div>
-              </div>
-            <div>
+  <%- include("./common/navbar.ejs") %>
+
+  <div class="container">
+    <h3 class="indigo-text text-darken-4">Upload Video</h3>
+    <form id="upload-video" action="/admin/upload" method="POST" enctype="multipart/form-data">
+      <div class="row">
+        <div class="col s12">
+          <span id="ps-message"></span>
+        </div>
+        <div class="input-field col s12">
+          <input id="video-title" type="text" name="title" required="" />
+          <label for="video-title">Video Title</label>
+        </div>
+        <div class="input-field col s12">
+          <textarea id="video-summary" name="summary" class="materialize-textarea" required=""></textarea>
+          <label for="video-summary">Summary/Info</label>
+        </div>
+        <div class="input-field col s12">
+          <select name="category" form="upload-video">
+            <% req.categories.forEach((category, i) => { %>
+            <option value="<%= category.id %>"><%= category.name %></option>
+            <% }); %>
+          </select>
+          <label>Video Category</label>
+        </div>
+        <div class="file-field input-field col s12">
+          <div class="btn waves-effect waves-light">
+            <span>File</span>
+            <input type="file" name="video" accept="video/mp4" required="">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text">
           </div>
         </div>
+        <div class="col s12">
+          <button id="upload-btn" type="submit" class="btn-large right waves-effect waves-light"><span>Submit</span></button>
+          <div id="progress-bar" class="progress-bar">
+            <div class="progress-bar-fill center-align">
+              <span class="progress-bar-text white-text">0</span>
+            </div>
+          </div>
+        </div> 
       </div>
-    </div>
+    </form>
   </div>
 </body>
 
 <script src="../js/jquery-3.4.1.min.js"></script>
+  <!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script>
   $(document).ready(function() {
+    $(".sidenav").sidenav();
+
+    $('select').formSelect();
+
     $('#upload-video').on('submit', function(event) {
       event.preventDefault();
 
       $('#upload-btn').css('visibility', 'hidden');
+      $('#progress-bar').css('visibility', 'visible');
 
       var form_data = new FormData($('#upload-video')[0]);
 
@@ -100,11 +113,12 @@
         success: function(data) {
           alert(data);
           $('#upload-video')[0].reset();
+          $('#progress-bar').css('visibility', 'hidden');
           $('#upload-btn').css('visibility', 'visible');
         },
         error: function (xhr, error) {
-          $('.progress-bar-text').html('FAILED');
-          $('.progress-bar-fill').css('width', '100%');
+          alert("Upload Failed");
+          $('#progress-bar').css('visibility', 'hidden');
           $('#upload-btn').css('visibility', 'visible');
         }
       });

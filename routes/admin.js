@@ -29,7 +29,19 @@ var upload = multer({ storage: multerStore });
 
 /* GET users listing. */
 router.get('/', auth.isAuthAdmin, function(req, res, next) {
-  res.render('admin/index', { title: title });
+  res.render('admin/index', { title: title, req: req });
+});
+
+router.get('/editpage', auth.isAuthAdmin, content.get_categories, function(req, res, next) {
+  res.render('admin/editvideo', { title: title, req: req });
+});
+
+router.get('/userspage', auth.isAuthAdmin, function(req, res, next) {
+  res.render('admin/users', { title: title, req: req });
+});
+
+router.get('/mail', auth.isAuthAdmin, function(req, res, next) {
+  res.render('admin/mail', { title: title, req: req });
 });
 
 router.get('/uploadpage', auth.isAuthAdmin, content.get_categories, function(req, res, next) {

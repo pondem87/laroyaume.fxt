@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <style>
+      .progress-bar {
+        border: 3px solid darkblue;
+        background: white;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: blue;
+      }
+
+      .progress-bar, .progress-bar-fill {
+        border-radius: 50px;
+      }
+    </style>
+</head>
+<body>
+
+  <%- include("./common/navbar.ejs") %>
+
+  <div class="container">
+    <h3 class="indigo-text text-darken-4">Edit Videos</h3>
+    <div class="row">
+      <div class="col s12 m6">
+        <form id="search-category">
+          <div class="input-field col s12">
+            <select name="category" form="search-category">
+              <% req.categories.forEach((category, i) => { %>
+              <option value="<%= category.id %>"><%= category.name %></option>
+              <% }); %>
+            </select>
+            <label>Video Category</label>
+          </div>
+          <button type="submit" class="btn right waves-effect waves-light">get all</button>
+        </form>  
+      </div>
+      <div class="col s12 m6">
+        <form>
+          <div class="input-field col s12">
+            <input id="video-title" type="text" name="title" required="" />
+            <label for="video-title">Search Video Title</label>
+          </div>
+          <button type="submit" class="btn right waves-effect waves-light">search</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+
+<script src="../js/jquery-3.4.1.min.js"></script>
+  <!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $(".sidenav").sidenav();
+
+    $("select").formSelect();
+  });
+</script>
+
+</html>
