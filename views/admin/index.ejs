@@ -16,8 +16,23 @@
   <%- include("./common/navbar.ejs") %>
 
   <div class="container">
-    <h2 class="indigo-text text-darken-3">ADMINSTRATOR HOME PAGE</h2>
-    <h4 class="indigo-text text-darken-4">You are logged in with administrator privileges<h4>
+    <div class="z-depth-2 center-align indigo darken-4">
+      <h2 class="white-text">ADMINSTRATOR HOME PAGE</h2>
+    </div>
+    <div class="row">
+      <div class="col s12 center-align">
+        <h4 class="indigo-text text-darken-4">You are logged in with administrator privileges<h4></h4>
+      </div>
+      <div class="col s12 center-align">
+        <div>
+          <i class="large material-icons">account_box</i>
+          <div>
+            <h4><%= req.user.fullname %></h4>
+            <p class="flow-text"><%= req.user.email %></p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="../js/jquery-3.4.1.min.js"></script>

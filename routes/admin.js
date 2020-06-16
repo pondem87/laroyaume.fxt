@@ -53,4 +53,8 @@ router.post('/upload', auth.isAuthAdmin, upload.single('video'), function(req, r
  tools.insert_video(req, res);
 });
 
+router.post('/searchvideos', auth.isAuthAdmin, function(req, res, next) {
+  tools.search_videos(req, res);
+ });
+
 module.exports = router;

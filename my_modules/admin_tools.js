@@ -47,7 +47,44 @@ var insert_video = function (req, res) {
   });
 };
 
+var search_videos = function(req, res) {
+  console.log("admin_tools: called the search_videos function");
+  pool.getConnection((error, connection) => {
+    if (error) {
+      console.log("admin_tools: search_videos: error on getConnection");
+      res.json([]);
+      return;
+    }
+
+    var sql = null;
+    var values = null;
+
+    if (req.body.category_id) {
+      sql = 'select * from `videos` where `category_id` = ?';
+      values = req.body.category_id;
+    } else if (req.body.title) {
+      sql = 'select * from `videos` where `title` like ?';
+      values = '%' + req.body.title + '%';
+    } else {
+      res.json([]);
+      return;
+    }
+
+    connection.query(sql, [values], (error, results, fields) => {
+      if (error) {
+        console.log("admin_tools: search_videos: error on querying connection");
+        res.json([]);
+        return;
+      }
+      connection.release();
+      console.log("admin_tools: search_videos: query ran succesfully");
+      res.json(results);
+    });
+  });
+}
+
 module.exports = {
   insert_video: insert_video,
-  get_key: get_key
+  get_key: get_key,
+  search_videos: search_videos
 }

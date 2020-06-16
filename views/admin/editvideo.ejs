@@ -38,7 +38,7 @@
       <div class="col s12 m6">
         <form id="search-category">
           <div class="input-field col s12">
-            <select name="category" form="search-category">
+            <select name="category" id="select-category">
               <% req.categories.forEach((category, i) => { %>
               <option value="<%= category.id %>"><%= category.name %></option>
               <% }); %>
@@ -49,7 +49,7 @@
         </form>  
       </div>
       <div class="col s12 m6">
-        <form>
+        <form id="search-title">
           <div class="input-field col s12">
             <input id="video-title" type="text" name="title" required="" />
             <label for="video-title">Search Video Title</label>
@@ -58,6 +58,8 @@
         </form>
       </div>
     </div>
+
+    <div id="output"></div>
 
   </div>
 
@@ -71,6 +73,58 @@
     $(".sidenav").sidenav();
 
     $("select").formSelect();
+
+    $("#search-category").on('submit', function(event) {
+      event.preventDefault();
+      var category_id = $("#select-category").val();
+
+      console.log(category_id);
+
+      $.post('/admin/searchvideos', { category_id: category_id }, function(data, status) {
+        if (status == "success") {
+          output(data);
+        } else {
+          alert(`Failed to get videos. Status ${status}`);
+        }
+      }, "json");
+    });
+
+    $("#search-title").on('submit', function(event) {
+      event.preventDefault();
+      var title = $("#video-title").val();
+
+      console.log(title);
+
+      $.post('/admin/searchvideos', { title: title }, function(data, status) {
+        if (status == "success") {
+          output(data);
+        } else {
+          alert(`Failed to get videos. Status ${status}`);
+        }
+      }, "json");
+    });
+
+    var output = function (obj) {
+      if (obj.length > 0) {
+        console.log("output received obj: ", obj);
+        $("#output").empty();
+        $("#output").append('<ul class="collection"><ul>');
+        obj.forEach(element => {
+          var html = `<li class="collection-item">`;
+          html += `<div><i class="material-icons indigo-text medium left">theaters</i>`;
+          html += `<div><span class="title">${element.title}</span>`;
+          html += `<p class="truncate">${element.summary}</p></div></div>`;
+          html += `<a href="#" class="secondary-content">`;
+          html += `<i class="material-icons indigo-text">create</i>`;
+          html += `<i class="material-icons indigo-text">cancel</i>`;
+          html += `</a></li>`;
+          $("#output").find(".collection").append(html);
+        });
+      } else {
+        $("#output").empty();
+        $("#output").append('<p class="flow-text red-text text-darken-4 center-align">Sorry... No videos found!</p>');
+      }
+    }
   });
 </script>
 
