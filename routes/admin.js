@@ -55,6 +55,16 @@ router.post('/upload', auth.isAuthAdmin, upload.single('video'), function(req, r
 
 router.post('/searchvideos', auth.isAuthAdmin, function(req, res, next) {
   tools.search_videos(req, res);
- });
+});
+
+router.post('/deletevideo', auth.isAuthAdmin, function(req, res, next) {
+  console.log("req body:", req.body);
+  tools.delete_video(req, res);
+});
+
+router.post('/updatevideo', auth.isAuthAdmin, function(req, res, next) {
+  console.log("req body:", req.body);
+  tools.update_video(req, res);
+});
 
 module.exports = router;

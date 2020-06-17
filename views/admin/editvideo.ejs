@@ -61,6 +61,52 @@
 
     <div id="output"></div>
 
+    <div class="modal" id="edit">
+      <div class="modal-content center-align">
+        <h4 class="indigo-text text-darken-5">Edit: <span class="video-title"></span></h4>
+        <div class="row">
+          <form id="edit-form">
+            <div class="input-field col s12">
+              <input id="video-title2" type="text" value="" name="title" placeholder="Video Title" class="validate" required="" />
+            </div>
+            <div class="input-field col s12">
+              <textarea id="video-summary" name="summary" value="" placeholder="Summary" class="materialize-textarea validate" required=""></textarea>
+            </div>
+            <div class="file-field input-field col s12">
+              <p class="left">Thumbnail   </p>
+              <div class="btn waves-effect waves-light">
+                <span>File</span>
+                <input type="file" id="image" name="image" accept="image/jpg, image/png, image/gif">
+              </div>
+              <div class="file-path-wrapper">
+                <input class="file-path validate" type="text">
+              </div>
+            </div>
+            <div class="col s12">
+              <i class="btn left waves-effect waves-light modal-close"><span>cancel</span></i>
+              <button type="submit" class="btn right waves-effect waves-light"><span>save</span></button>
+            </div> 
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="delete">
+      <div class="modal-content center-align">
+        <p class="flow-text">Are you sure you want to permanently delete:</p>
+        <p class="flow-text delete-title"></p>
+        <div class="col s12">
+          <i class="btn left waves-effect waves-light modal-close"><span>cancel</span></i>
+          <form id="delete-form">
+            <button type="submit" class="btn right red darken-4 waves-effect waves-light"><span>delete</span></button> 
+          </form>
+        </div>
+        <div class="col s12">
+          <p>You will not be able to undo delete</p>
+        </div> 
+      </div>
+    </div>
+
   </div>
 
 </body>
@@ -70,6 +116,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script>
   $(document).ready(function() {
+    var videos = [];
+
     $(".sidenav").sidenav();
 
     $("select").formSelect();
@@ -110,22 +158,100 @@
         $("#output").empty();
         $("#output").append('<ul class="collection"><ul>');
         obj.forEach(element => {
-          var html = `<li class="collection-item">`;
-          html += `<div><i class="material-icons indigo-text medium left">theaters</i>`;
+          var html = `<li class="collection-item avatar">`;
+          html += `<i class="material-icons indigo-text medium circle">theaters</i>`;
           html += `<div><span class="title">${element.title}</span>`;
-          html += `<p class="truncate">${element.summary}</p></div></div>`;
-          html += `<a href="#" class="secondary-content">`;
-          html += `<i class="material-icons indigo-text">create</i>`;
-          html += `<i class="material-icons indigo-text">cancel</i>`;
-          html += `</a></li>`;
+          html += `<p class="truncate">${element.summary}</p></div>`;
+          html += `<div class="secondary-content">`;
+          html += `<button data-target="edit" class="btn-floating modal-trigger edit-btn"><i class="material-icons indigo-text">create</i></button>`;
+          html += `<input type="hidden" value="${element.id}">`;
+          html += `<button data-target="delete" class="btn-floating modal-trigger delete-btn red darken-4"><i class="material-icons black-text">cancel</i></button>`;
+          html += `</div></li>`;
           $("#output").find(".collection").append(html);
         });
+        videos = obj;
+        $(".modal").modal();
+        addListeners();
       } else {
+        videos = [];
         $("#output").empty();
         $("#output").append('<p class="flow-text red-text text-darken-4 center-align">Sorry... No videos found!</p>');
       }
+    };
+
+    var addListeners = function() {
+
+      $(".edit-btn").click(function() {
+        console.log("edit clicked");
+        var btn = $(this);
+        console.log("next el: ", btn.next())
+        var video_id = btn.next().val();
+        var video = getVideo(video_id);
+        console.log("get video returned:", video);
+        $("#edit").find(".video-title").html(`${video.title}`);
+        $("#video-title2").val(video.title);
+        $("#video-summary").val(video.summary);
+        $("#edit").find("form").append(`<input type="hidden" name="id" value="${video.id}" >`);
+      });
+
+      $(".delete-btn").click(function() {
+        console.log("delete clicked");
+        var btn = $(this);
+        console.log("prev el: ", btn.prev())
+        var video_id = btn.prev().val();
+        console.log(video_id);
+        var video = getVideo(video_id);
+        console.log("get video returned:", video);
+        $("#delete").find(".delete-title").html(`${video.title}`);
+        $("#delete").find("form").append(`<input type="hidden" name="id" value="${video.id}" >`);
+        $("#delete").find("form").append(`<input type="hidden" name="video_src" value="${video.video_src}" >`);
+      });
     }
+
+    var getVideo = function(id) {
+      var video = null;
+      videos.forEach(function(vid) {
+        if (vid.id == id) {
+          video = vid;
+        }
+      });
+
+      return video;
+    }
+
+    $("#delete-form").on('submit', function(event) {
+      event.preventDefault();
+
+      var form_data = {
+        id: $("#delete-form").find("input[name=id]").val(),
+        video_src: $("#delete-form").find("input[name=video_src]").val()
+      };
+      console.log(form_data);
+
+      $.ajax({
+        type: 'POST',
+        url: '/admin/deletevideo',
+        data: form_data,
+        datatype: 'json',
+        success: function(data) {
+          alert(data.response);
+          if (data.status == 1) {
+            output(videos.filter(function(video) {
+              return (video.id !== form_data.id);
+            }));
+          }
+          $("#delete").find(".modal-close").click();
+        }
+      })
+    });
+
+    $("#edit-form").on('submit', function(event) {
+      event.preventDefault();
+
+      
+    });
   });
+
 </script>
 
 </html>
