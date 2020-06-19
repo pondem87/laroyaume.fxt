@@ -65,7 +65,7 @@
       <div class="modal-content center-align">
         <h4 class="indigo-text text-darken-5">Edit: <span class="video-title"></span></h4>
         <div class="row">
-          <form id="edit-form">
+          <form id="edit-form" enctype="multipart/form-data">
             <div class="input-field col s12">
               <input id="video-title2" type="text" value="" name="title" placeholder="Video Title" class="validate" required="" />
             </div>
@@ -236,11 +236,16 @@
         success: function(data) {
           alert(data.response);
           if (data.status == 1) {
-            output(videos.filter(function(video) {
-              return (video.id !== form_data.id);
-            }));
+            var newvideos = [];
+            videos.forEach(function(video) {
+              if (video.id !== form_data.id) {
+                newvideos.push[video];
+              }
+            });
+
+            output(newvideos);
+            $("#delete").find(".modal-close").click();
           }
-          $("#delete").find(".modal-close").click();
         }
       })
     });
@@ -248,7 +253,30 @@
     $("#edit-form").on('submit', function(event) {
       event.preventDefault();
 
-      
+      var form_data = new FormData($("#edit-form")[0]);
+
+      $.ajax({
+        type: 'POST',
+        url: '/admin/updatevideo',
+        data: form_data,
+        contentType: false,
+        processData: false,
+        //datatype: 'json',
+        success: function(data) {
+          alert(data.response);
+          if (data.status == 1) {
+            videos.forEach(video => {
+              if (video.id == data.id) {
+                video.title = data.title,
+                video.summary = data.summary
+              }
+            })
+
+            output(videos);
+            $("#edit").find(".modal-close").click();
+          }
+        }
+      })
     });
   });
 

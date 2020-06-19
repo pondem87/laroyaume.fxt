@@ -2,6 +2,7 @@ var pool = require('./database').get_pool();
 var str = require('@supercharge/strings');
 var path = require('path');
 var aws = require('aws-sdk');
+var fs = require('fs');
 
 var get_key = function (req, file, callback) {
   var key = str.random(8).toUpperCase() + path.extname(file.originalname);
@@ -84,8 +85,37 @@ var search_videos = function(req, res) {
   });
 }
 
-var upadate_video = function(req, res) {
+var update_video = function(req, res) {
+  var values = [{
+    title: req.body.title,
+    summary: req.body.summary
+  }, req.body.id];
 
+  pool.getConnection((error, connection) => {
+    if (error) {
+      console.log("admin_tools: update_video: error on getConnection");
+      res.json({ status: 0, response: "Failed to update video information"});
+      return;
+    }
+
+    var sql = 'update `videos` set ? where `id` = ?';
+
+    if (req.file) {
+      values[0].thumbnail = "/img/thumbnail/" + req.file.filename;
+    }
+
+    connection.query(sql, values, (error, results, fields) => {
+      if (error) {
+        console.log("admin_tools: update_video: error on querying connection");
+        res.json({ status: 0, response: "Failed to update video information"});
+        connection.release();
+        return;
+      }
+      connection.release();
+      console.log("admin_tools: update_videos: query ran succesfully");
+      res.json({ status: 1, response: "Updated video successfully", id: req.body.id, title: req.body.title, summary: req.body.summary});
+    });
+  });
 }
 
 var delete_video = function(req, res) {
@@ -116,7 +146,7 @@ var delete_video = function(req, res) {
       pool.getConnection((error, connection) => {
         if (error) {
           console.log("admin_tools: delete_video: failed to get dbase connection");
-          res.json({ status: 0, response: "Failed to remove entry from database"})
+          res.json({ status: 0, response: "Failed to remove entry from database"});
           return;
         }
         var sql = 'delete from `videos` where `id` = ?';
@@ -125,9 +155,15 @@ var delete_video = function(req, res) {
           if (error) {
             console.log("admin_tools: delete_video: failed to run dbase query:", error.message);
             res.json({ status: 0, response: "Failed to remove entry from database"});
+            connection.release();
           } else {
+            if (req.body.thumbnail !== "/img/thumbnail/video1.jpg")
+            {
+              if (fs.existsSync(__dirname + "/../public" + req.body.thumbnail)) fs.unlinkSync(__dirname + "/../public" + req.body.thumbnail);
+            }
             console.log("admin_tools: delete_video: successful");
             res.json({ status: 1, response: "Deleted video successfully"});
+            connection.release();
           }
         });
       });
@@ -139,6 +175,6 @@ module.exports = {
   insert_video: insert_video,
   get_key: get_key,
   search_videos: search_videos,
-  upadate_video: upadate_video,
+  update_video: update_video,
   delete_video: delete_video
 }

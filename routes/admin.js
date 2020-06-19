@@ -2,6 +2,9 @@ var express = require('express');
 var multer = require('multer');
 var multerS3 = require('multer-s3');
 var aws = require('aws-sdk');
+var path = require('path');
+var fs = require('fs');
+var str = require('@supercharge/strings');
 var tools = require('../my_modules/admin_tools');
 var content = require('../my_modules/user_content');
 var auth = require('../my_modules/auth');
@@ -25,7 +28,26 @@ var multerStore = multerS3({
   }
 });
 
-var upload = multer({ storage: multerStore });
+var vid_upload = multer({ storage: multerStore });
+
+/* SET UP MULTER FOR LOCAL UPLOAD */
+var localStore = multer.diskStorage({
+  destination: function(req, file, callback) {
+    console.log("return directory name");
+    callback(null, __dirname + "/../public/img/thumbnail/")
+  },
+  filename: function(req, file, callback) {
+    var img_root = __dirname + "/../public/img/thumbnail/";
+    var filename = null;
+    do {
+      filename = str.random(7).toUpperCase() + path.extname(file.originalname);
+    } while (fs.existsSync(img_root + filename));
+    console.log("return file name");
+    callback(null, filename);
+  }
+});
+
+var img_upload = multer({ storage: localStore });
 
 /* GET users listing. */
 router.get('/', auth.isAuthAdmin, function(req, res, next) {
@@ -49,7 +71,7 @@ router.get('/uploadpage', auth.isAuthAdmin, content.get_categories, function(req
 });
 
 /* POST users listing */
-router.post('/upload', auth.isAuthAdmin, upload.single('video'), function(req, res, next) {
+router.post('/upload', auth.isAuthAdmin, vid_upload.single('video'), function(req, res, next) {
  tools.insert_video(req, res);
 });
 
@@ -58,12 +80,10 @@ router.post('/searchvideos', auth.isAuthAdmin, function(req, res, next) {
 });
 
 router.post('/deletevideo', auth.isAuthAdmin, function(req, res, next) {
-  console.log("req body:", req.body);
   tools.delete_video(req, res);
 });
 
-router.post('/updatevideo', auth.isAuthAdmin, function(req, res, next) {
-  console.log("req body:", req.body);
+router.post('/updatevideo', auth.isAuthAdmin, img_upload.single('image'), function(req, res, next) {
   tools.update_video(req, res);
 });
 
