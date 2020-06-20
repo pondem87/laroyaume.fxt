@@ -9,11 +9,15 @@ var email = process.env.CONTACT_MAIL;
 var app_number = process.env.CONTACT_NUMBER;
 
 /* GET request routes */
-router.get('/', content.get_categories, content.get_videolist, function(req, res, next) {
+router.get('/', content.get_categories, function(req, res, next) {
   res.render('index', {
     title: title,
     req: req
   });
+});
+
+router.get('/getvideos', function(req, res, next) {
+  content.get_videolist(req, res, next);
 });
 
 router.get('/about', function(req, res, next) {

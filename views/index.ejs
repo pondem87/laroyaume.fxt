@@ -92,9 +92,8 @@ https://templatemo.com/tm-552-video-catalog
                                 <ul class="nav tm-category-list">
                                   <% req.categories.forEach((category, i) => { %>
                                     <li class="nav-item tm-category-item">
-                                      <a href="/?category=<%= category.id %>"
-                                        class="nav-link tm-category-link
-                                          <% if (category.id == req.category) {%> active <%} %> page<%= Math.trunc(i/6) + 1 %>"><%= category.name %></a>
+                                      <a href="javascript:void(0);" id="<%= category.id %>"
+                                        class="nav-link tm-category-link nav-category"><%= category.name %></a>
                                     </li>
                                   <% }); %>
                                 </ul>
@@ -102,35 +101,11 @@ https://templatemo.com/tm-552-video-catalog
                         </div>
                     </div>
 
-                    <div class="row tm-catalog-item-list">
-                      <%  if (req.videos.length > 0) {
-                          req.videos.forEach((video) => { %>
-                        <div class="col-lg-4 col-md-6 col-sm-12 tm-catalog-item">
-                            <div class="position-relative tm-thumbnail-container">
-                                <img src="<%= video.thumbnail %>" alt="Image" class="img-fluid tm-catalog-item-img">
-                                <a href="/users/video-page?id=<%= video.id %>" class="position-absolute tm-img-overlay">
-                                    <i class="fas fa-play tm-overlay-icon"></i>
-                                </a>
-                            </div>
-                            <div class="p-4 tm-bg-gray tm-catalog-item-description">
-                                <h3 class="tm-text-primary mb-3 tm-catalog-item-title"><%= video.title %></h3>
-                                <p class="tm-catalog-item-text"><%= video.summary %></p>
-                            </div>
-                        </div>
-                      <% });
-                      } %>
-
-                    </div>
+                    <div class="row tm-catalog-item-list" id="videos-display"></div>
 
                     <!-- Catalog Paging Buttons -->
-                    <div>
-                        <ul class="nav tm-paging-links">
-                            <li class="nav-item active"><i class="nav-link tm-paging-link">1</i></li>
-                            <li class="nav-item"><i class="nav-link tm-paging-link">2</i></li>
-                            <li class="nav-item"><i class="nav-link tm-paging-link">3</i></li>
-                            <li class="nav-item"><i class="nav-link tm-paging-link">4</i></li>
-                            <li class="nav-item"><i class="nav-link tm-paging-link">></i></li>
-                        </ul>
+                    <div id="pages-display">
+                        <ul class="nav tm-paging-links"></ul>
                     </div>
                 </main>
 
@@ -146,6 +121,78 @@ https://templatemo.com/tm-552-video-catalog
     <script src="js/bootstrap.min.js"></script>
     <script src="js/parallax.min.js"></script>
     <script src="js/custom.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var videos = [];
+            var pageSize = 9;
+
+            var getVideos = function(category_id) {
+                $.get('/getvideos', {category: category_id}, function(data) {
+                    if (data.status == 1) {
+                        videos = data.response;
+                        displayVideos(0, pageSize);
+                        displayPages();
+                    }
+                }, 'json')
+            }
+
+            var displayVideos = function(start, number) {
+                $("#videos-display").empty();
+                var html = "";
+                for (var i = start; i < (start + number); i++)
+                {
+                    if (videos[i]) {
+                        html += `<div class="col-lg-4 col-md-6 col-sm-12 tm-catalog-item">
+                                    <div class="position-relative tm-thumbnail-container">
+                                        <img src="${videos[i].thumbnail}" alt="Image" class="img-fluid tm-catalog-item-img">
+                                        <a href="/users/video-page?id=${videos[i].id}" class="position-absolute tm-img-overlay">
+                                            <i class="fas fa-play tm-overlay-icon"></i>
+                                        </a>
+                                    </div>
+                                    <div class="p-4 tm-bg-gray tm-catalog-item-description">
+                                        <h3 class="tm-text-primary mb-3 tm-catalog-item-title">${videos[i].title}</h3>
+                                        <p class="tm-catalog-item-text">${videos[i].summary}</p>
+                                    </div>
+                                </div>`;
+                    }
+                }
+
+                $("#videos-display").append(html);
+            }
+
+            var displayPages = function() {
+                $("#pages-display").children("ul").empty();
+                var pages = Math.trunc(videos.length/pageSize) + 1;
+                var html = "";
+                for (var i = 0; i < pages; i++) {
+                    if (i == 0 ) {
+                        html  += `<li class="nav-item nav-page active"><i class="nav-link tm-paging-link">1</i></li>`;
+                    } else {
+                        html  += `<li class="nav-item nav-page"><i class="nav-link tm-paging-link">${i + 1}</i></li>`;
+                    }
+                }
+                
+                $("#pages-display").children("ul").append(html);
+
+                $(".nav-page").click(function() {
+                    $(".nav-page").removeClass("active");
+                    $(this).addClass("active");
+                    var page = parseInt($(this).children().html());
+                    console.log(`Page ${page} selected`);
+                    displayVideos((page - 1) * pageSize, pageSize);
+                });
+            }
+
+            $(".nav-category").click(function() {
+                $(".nav-category").removeClass("active");
+                $(this).addClass("active");
+                var category_id = $(this).attr('id');
+                getVideos(category_id);
+            });
+
+            $(".nav-category").first().click();
+        });
+    </script>
 </body>
 
 </html>

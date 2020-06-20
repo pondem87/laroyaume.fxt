@@ -22,7 +22,6 @@ const get_categories = function (req, res, next) {
 
 const get_videolist = function (req, res, next) {
   var category = req.query.category ? req.query.category : 1;
-  req.category = category;
 
   pool.getConnection((error, connection) => {
     if (error) throw new Error(error.message);
@@ -32,14 +31,11 @@ const get_videolist = function (req, res, next) {
     connection.query(sql, values, (error, results, fields) => {
       if (error) {
         connection.release();
+        res.json({status: 1, response: null});
         throw new Error(error.message);
       }
-
-      req.videos = results;
-      console.log("videos:", results);
-      req.pages = Math.trunc(req.videos.length/6) + 1;
+      res.json({status: 1, response: results});
       connection.release();
-      next();
     });
   });
 };
